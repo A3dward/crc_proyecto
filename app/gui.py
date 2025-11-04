@@ -21,7 +21,7 @@ class App:
     def __init__(self, master):
         self.env = load_env()
         self.role = self.env.get("ROLE", "servidor")
-               self.host = self.env.get("HOST", "0.0.0.0")
+        self.host = self.env.get("HOST", "0.0.0.0")
         self.port = int(self.env.get("PORT", "5000"))
         self.peer_host = self.env.get("PEER_HOST", "127.0.0.1")
         self.peer_port = int(self.env.get("PEER_PORT", "5000"))
