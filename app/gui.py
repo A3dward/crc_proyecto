@@ -5,7 +5,15 @@ from tkinter import font as tkfont
 
 from link.tcp_peer import TcpPeer
 from link.frame import build_frame_from_input, parse_frame
-from crc.crc_core import explain_crc_long_division
+
+# intentar usar la explicaciÃ³n matemÃ¡tica si existe
+try:
+    from crc.crc_core import explain_crc_long_division as explain_crc
+except Exception:
+    try:
+        from crc.crc_core import explain_crc_math as explain_crc
+    except Exception:
+        def explain_crc(data, poly_bits): return ""
 
 def load_env(path=".env"):
     env = {}
@@ -31,7 +39,6 @@ class App:
 
         master.title("crc wifi gui")
 
-        # izquierda: entrada
         left = tk.Frame(master, bg="#2b579a", width=420)
         left.pack(side=tk.LEFT, fill=tk.BOTH, expand=False)
         tk.Label(left, text="mensajes para enviar", bg="#e67e22").pack(fill=tk.X)
@@ -40,7 +47,6 @@ class App:
         self.entry.pack(fill=tk.X, padx=6, pady=4)
         tk.Button(left, text="enviar", command=self.on_send).pack(padx=6, pady=6, anchor="w")
 
-        # derecha: salida
         right = tk.Frame(master, bg="#2b579a")
         right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         tk.Label(right, text="apartado para recibir", bg="#e67e22").pack(fill=tk.X)
@@ -53,7 +59,7 @@ class App:
         self.txt_crc = scrolledtext.ScrolledText(right, height=7, bg="#66bb6a")
         self.txt_crc.pack(fill=tk.BOTH, expand=True, padx=6, pady=4)
 
-        tk.Label(right, text="operación CRC (división binaria):", bg="#2b579a", fg="white").pack(anchor="w", padx=6, pady=(6,0))
+        tk.Label(right, text="operaciÃ³n CRC (divisiÃ³n binaria):", bg="#2b579a", fg="white").pack(anchor="w", padx=6, pady=(6,0))
         self.txt_proc = scrolledtext.ScrolledText(right, height=16, bg="#66bb6a")
         try:
             self.txt_proc.configure(font=tkfont.Font(family="Consolas", size=10))
@@ -73,7 +79,7 @@ class App:
             self.peer.send(self.peer_host, self.peer_port, frame)
             self.entry.delete(0, tk.END)
         except Exception as e:
-            self._append(self.txt_msg, f"error de envío: {e}\n")
+            self._append(self.txt_msg, f"error de envÃ­o: {e}\n")
 
     def _append(self, widget, s):
         widget.configure(state="normal")
@@ -106,10 +112,9 @@ class App:
             )
             self._append(self.txt_crc, detalles)
 
-            # División binaria visual
-            steps = explain_crc_long_division(payload, self.poly_bits)
-            self._append(self.txt_proc, steps + "\n")
-
+            steps = explain_crc(payload, self.poly_bits)
+            if steps:
+                self._append(self.txt_proc, steps + "\n")
         except Exception as e:
             self._append(self.txt_msg, f"error al procesar: {e}\n")
 
@@ -118,7 +123,6 @@ def main():
     app = App(root)
     root.mainloop()
 
-
-
-if __name__== "__main__":
+if __name__ == "__main__":
+    
     main()
