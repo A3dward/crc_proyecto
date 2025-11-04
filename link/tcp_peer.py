@@ -2,7 +2,7 @@
 import threading
 
 class TcpPeer:
-    def __init__(self, host="0.0.0.0", port=5000, on_data=None):
+    def _init_(self, host="0.0.0.0", port=5000, on_data=None):
         self.host = host
         self.port = int(port)
         self.on_data = on_data
